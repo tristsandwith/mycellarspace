@@ -1,0 +1,1344 @@
+<title>My Cellar Space</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Manrope:wght@700;800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root {
+  --ground: #e8ebea;
+  --panel: #ffffff;
+  --ink: #1a1f22;
+  --muted: #5b666b;
+  --line: #cdd4d2;
+  --accent: #7a1f35;
+  --accent-ink: #ffffff;
+  --field: #f5f7f6;
+  --shadow: 0 18px 40px -18px rgba(20, 28, 32, .45);
+
+  --cab: #22282c;
+  --cab-edge: #343c41;
+  --interior: #0c1114;
+  --wire: #a9b4ba;
+  --led: #7fc4ff;
+
+  --st-open: #5fb8a6;
+  --st-ready: #3fae6a;
+  --st-drinkup: #c9b23a;
+  --st-last: #e0a43a;
+  --st-wait: #6f93c9;
+  --st-past: #d4524e;
+  --st-none: #8a959a;
+
+  --display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #111416;
+    --panel: #1a1f22;
+    --ink: #e7ebec;
+    --muted: #98a3a8;
+    --line: #2d3539;
+    --accent: #c65a73;
+    --accent-ink: #160609;
+    --field: #13171a;
+    --shadow: 0 18px 40px -18px rgba(0, 0, 0, .8);
+    --cab: #1b2023;
+    --cab-edge: #2c3337;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #111416;
+  --panel: #1a1f22;
+  --ink: #e7ebec;
+  --muted: #98a3a8;
+  --line: #2d3539;
+  --accent: #c65a73;
+  --accent-ink: #160609;
+  --field: #13171a;
+  --shadow: 0 18px 40px -18px rgba(0, 0, 0, .8);
+  --cab: #1b2023;
+  --cab-edge: #2c3337;
+}
+
+html { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+.slot { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+.slot.drag-src .bottle { opacity: .25; }
+.slot.drop-ok::after { content: ""; position: absolute; inset: 2px; border-radius: 50%; border: 2px dashed var(--led); opacity: .55; pointer-events: none; }
+.slot.drop-hover::after { opacity: 1; background: rgba(127, 196, 255, .18); }
+.drag-ghost { position: fixed; left: 0; top: 0; width: 56px; height: 56px; pointer-events: none; z-index: 30; display: grid; place-items: center; filter: drop-shadow(0 10px 14px rgba(0,0,0,.55)); }
+.drag-ghost .bottle { width: 100%; transform: scale(1.12); }
+.fridge-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.fridge-tabs button { appearance: none; font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; }
+.fridge-tabs button[aria-current="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.edge { position: fixed; top: 0; right: 0; bottom: 0; width: 22px; z-index: 5; touch-action: pan-y; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.edge::after { content: ""; position: absolute; right: 5px; top: 50%; width: 4px; height: 46px; margin-top: -23px; border-radius: 2px; background: var(--muted); opacity: .35; transition: opacity .2s, transform .2s; }
+.edge.holding::after { opacity: .9; transform: scaleY(1.3); }
+.move-hint { font-size: 12px; color: var(--muted); margin: 0; text-align: center; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 6px 16px 48px;
+}
+.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 10px; }
+
+header { display: grid; gap: 6px; justify-items: center; position: relative; }
+h1 {
+  font-family: "Manrope", "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 800;
+  font-size: clamp(28px, 7vw, 40px);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+}
+.sub { color: var(--muted); margin: 0; max-width: 60ch; }
+header h1 { padding: 0 44px; }
+.burger { position: absolute; top: -5px; right: -6px; width: 40px; height: 40px; display: grid; place-content: center; gap: 5px; appearance: none; border: 0; background: none; border-radius: 8px; cursor: pointer; color: var(--ink); }
+.burger span { display: block; width: 22px; height: 2px; border-radius: 1px; background: currentColor; }
+.burger:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+.menu { list-style: none; margin: 0; padding: 0; display: grid; }
+.menu li + li { border-top: 1px solid var(--line); }
+.menu button { appearance: none; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 2px; border: 0; background: none; font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
+.menu button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.menu button[disabled] { opacity: .5; cursor: default; }
+.menu .lbl { display: grid; gap: 1px; font-weight: 600; }
+.menu .lbl small { font-weight: 400; font-size: 13px; color: var(--muted); }
+.menu .chev { color: var(--muted); font-size: 20px; line-height: 1; }
+.switch { flex: none; width: 46px; height: 28px; border-radius: 14px; background: var(--line); position: relative; transition: background .15s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .15s; }
+[aria-checked="true"] .switch { background: var(--accent); }
+[aria-checked="true"] .switch::after { transform: translateX(18px); }
+.pend-list { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+.steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+
+.layout { display: grid; gap: 28px; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); align-items: start; }
+@media (max-width: 760px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Fridge ---------- */
+.fridge-col { display: grid; justify-items: center; gap: 6px; touch-action: pan-y; }
+@keyframes in-from-right { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes in-from-left { from { transform: translateX(-40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.fridge.in-right { animation: in-from-right .22s ease-out; }
+.fridge.in-left { animation: in-from-left .22s ease-out; }
+.hist-btn { justify-self: start; }
+.hist-search { font: inherit; font-size: 16px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; width: 100%; }
+.hist-search:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.hist { display: grid; margin: 0; padding: 0; list-style: none; max-height: 60vh; overflow-y: auto; }
+.hist li + li { border-top: 1px solid var(--line); }
+.hist button { appearance: none; border: 0; background: none; color: inherit; font: inherit; text-align: left; width: 100%; padding: 10px 0; display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: center; cursor: pointer; }
+.hist button:hover .nm { text-decoration: underline; }
+.hist .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.btn.danger { color: var(--st-past); border-color: var(--st-past); background: none; }
+.fridge {
+  width: 100%;
+  max-width: 440px;
+  background: linear-gradient(180deg, var(--cab-edge), var(--cab) 6%, var(--cab) 94%, var(--cab-edge));
+  border-radius: 10px 10px 6px 6px;
+  padding: 14px 30px 18px 14px;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+.fridge::after { /* door handle */
+  content: "";
+  position: absolute;
+  right: 11px;
+  top: 30%;
+  width: 7px;
+  height: 22%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #11161a, #3a4247, #11161a);
+}
+.glass {
+  background:
+    linear-gradient(115deg, rgba(255,255,255,.07) 0 18%, transparent 18% 60%, rgba(255,255,255,.035) 60% 70%, transparent 70%),
+    var(--interior);
+  border: 2px solid #050809;
+  border-radius: 4px;
+  padding: 0 10px 12px;
+  display: grid;
+  gap: 0;
+}
+.led {
+  height: 16px;
+  margin: 0 22% 10px;
+  border-radius: 0 0 8px 8px;
+  background: #182026;
+  position: relative;
+}
+.led::after {
+  content: "";
+  position: absolute;
+  left: 18%; right: 18%; bottom: 3px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--led);
+  box-shadow: 0 0 14px 4px rgba(127, 196, 255, .45);
+}
+.glass.led-off .led::after { background: #2b343a; box-shadow: none; }
+.rung { position: relative; padding: 6px 0 12px; }
+.rung::after { /* wire rack, front edge */
+  content: "";
+  position: absolute;
+  left: -4px; right: -4px; bottom: 4px;
+  height: 5px;
+  border-top: 2px solid var(--wire);
+  border-bottom: 1px solid rgba(169, 180, 186, .45);
+  border-radius: 2px;
+}
+.rung-label {
+  position: absolute;
+  left: -2px; top: 2px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: #6c7a82;
+}
+.slots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; justify-items: center; }
+.slots.mag { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.base {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 3px solid #1f272c;
+  background: linear-gradient(180deg, #0f1519, var(--interior));
+}
+.base .rung::after { height: 7px; }
+
+.slot {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  width: 100%;
+  max-width: 62px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+  position: relative;
+  color: inherit;
+  font: inherit;
+}
+.slots.mag .slot { max-width: 92px; }
+.slot:focus-visible { outline: 2px solid var(--led); outline-offset: 3px; }
+
+.slot .empty {
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px dashed #3b474e;
+  display: grid;
+  place-items: center;
+  color: #56646c;
+  font-size: 18px;
+  line-height: 1;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.slot:hover .empty { border-color: var(--led); color: var(--led); background: rgba(127,196,255,.06); }
+
+.bottle {
+  width: 86%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.28), transparent 42%), var(--wine, #5a1426);
+  box-shadow: 0 0 0 3px var(--status, var(--st-none)), inset 0 0 0 4px rgba(0,0,0,.35);
+  transition: transform .15s;
+}
+.bottle::before { /* punt */
+  content: "";
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,0,0,.35), rgba(0,0,0,.08) 70%);
+}
+.slot:hover .bottle { transform: scale(1.06); }
+.bottle .vint {
+  position: relative;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--vint-ink, #f4e9ec);
+  font-variant-numeric: tabular-nums;
+}
+.slots.mag .bottle .vint { font-size: 13px; }
+
+.feet { display: flex; justify-content: space-between; width: 100%; max-width: 440px; padding: 0 18px; margin-top: -10px; }
+.feet span { width: 22px; height: 8px; background: #151a1d; border-radius: 0 0 4px 4px; }
+
+/* ---------- Side panel ---------- */
+.side { display: grid; gap: 22px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; display: grid; gap: 12px; }
+.card h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.count { font-family: var(--display); font-size: 34px; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
+.count small { font-family: var(--body); font-size: 14px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.legend { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.legend li { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+.legend .n { font-variant-numeric: tabular-nums; font-weight: 600; }
+.legend .desc { color: var(--muted); font-size: 13px; }
+
+.soon { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.soon li + li { border-top: 1px solid var(--line); }
+.soon button {
+  appearance: none; border: 0; background: none; color: inherit; font: inherit; text-align: left;
+  width: 100%; padding: 10px 0; display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: center; cursor: pointer;
+}
+.soon button:hover .nm { text-decoration: underline; }
+.soon button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.soon .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.none { color: var(--muted); margin: 0; }
+.notice { font-size: 13px; color: var(--muted); border-left: 3px solid var(--st-last); padding: 6px 10px; margin: 0; }
+
+/* ---------- Dialog ---------- */
+dialog {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+dialog::backdrop { background: rgba(8, 12, 14, .55); }
+.dlg { padding: 22px; display: grid; gap: 16px; }
+.dlg-head { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
+.slotcode { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.dlg h3 { font-family: var(--display); font-size: 26px; font-weight: 700; line-height: 1.15; margin: 2px 0 0; text-wrap: balance; }
+.x { appearance: none; border: 1px solid var(--line); background: none; color: var(--muted); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; }
+.x:hover { color: var(--ink); }
+
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+.facts dt { color: var(--muted); font-size: 13px; }
+.facts dd { margin: 0; }
+
+.window { display: grid; gap: 6px; }
+.pill { justify-self: start; display: inline-flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 600; padding: 3px 10px 3px 8px; border-radius: 999px; border: 1px solid var(--c); color: var(--ink); }
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.track { position: relative; height: 34px; }
+.track .bar { position: absolute; top: 8px; height: 8px; border-radius: 4px; background: var(--st-ready); opacity: .85; }
+.track .bar.seg { border-radius: 0; }
+.track .bar.s0 { border-radius: 4px 0 0 4px; }
+.track .bar.s2 { border-radius: 0 4px 4px 0; }
+.quiet { font-size: 13px; color: var(--muted); margin: 0; font-style: italic; max-width: 60ch; }
+.track .axis { position: absolute; left: 0; right: 0; top: 11px; height: 2px; background: var(--line); }
+.track .now { position: absolute; top: 2px; width: 2px; height: 20px; background: var(--ink); }
+.track .tick { position: absolute; top: 20px; font-family: var(--mono); font-size: 10px; color: var(--muted); transform: translateX(-50%); white-space: nowrap; }
+.row-nv { display: grid; grid-template-columns: 1fr 110px; gap: 12px; }
+.tn { display: grid; gap: 8px; }
+.tnote { margin: 0; display: grid; gap: 4px; padding-left: 12px; border-left: 2px solid var(--line); }
+.tnote blockquote { margin: 0; max-width: 65ch; }
+.tnote figcaption { font-size: 12px; color: var(--muted); font-weight: 600; }
+.srcs { margin: 0; padding-left: 18px; font-size: 13px; display: grid; gap: 2px; overflow-wrap: anywhere; }
+.dlg a { color: var(--accent); }
+.notes { white-space: pre-wrap; margin: 0; max-width: 65ch; }
+.notes-empty { color: var(--muted); font-style: italic; margin: 0; }
+.added { font-size: 12px; color: var(--muted); margin: 0; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.btn {
+  appearance: none; font: inherit; font-weight: 600; cursor: pointer;
+  padding: 10px 18px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--ink);
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn:focus-visible, .x:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn[disabled] { opacity: .6; cursor: progress; }
+
+form.dlg label { display: grid; gap: 4px; font-size: 13px; font-weight: 500; color: var(--muted); }
+form.dlg input, form.dlg select, form.dlg textarea {
+  font: inherit; font-size: 16px; color: var(--ink); background: var(--field);
+  border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; width: 100%;
+}
+form.dlg textarea { min-height: 110px; resize: vertical; }
+form.dlg input:focus, form.dlg select:focus, form.dlg textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+@media (max-width: 460px) { .row3 { grid-template-columns: 1fr 1fr; } }
+.hint { font-size: 12px; color: var(--muted); margin: -8px 0 0; }
+.err { color: var(--st-past); font-size: 13px; margin: 0; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--ink); color: var(--ground); border-radius: 8px; padding: 10px 12px 10px 16px;
+  display: flex; gap: 14px; align-items: center; box-shadow: var(--shadow); max-width: calc(100vw - 32px); z-index: 10;
+}
+.toast button { appearance: none; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 4px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 id="title">My Cellar Space</h1>
+    <button type="button" class="burger" id="menu-btn" aria-label="Menu" aria-haspopup="dialog"><span></span><span></span><span></span></button>
+    <ul class="fridge-tabs" id="fridge-tabs" hidden></ul>
+  </header>
+
+  <div class="layout">
+    <div class="fridge-col">
+      <div class="fridge" aria-label="Wine fridge, front view">
+        <div class="glass" id="glass">
+          <div class="led" aria-hidden="true"></div>
+          <!-- rungs rendered by script -->
+        </div>
+      </div>
+      <div class="feet" aria-hidden="true"><span></span><span></span></div>
+      <p class="move-hint">Hold a bottle, then drag it to move it.</p>
+    </div>
+
+    <div class="side">
+      <p class="notice" id="notice" hidden></p>
+
+      <section class="card" aria-labelledby="h-in">
+        <h2 id="h-in">In the fridge</h2>
+        <div class="count" id="count">0<small>of 33 spaces</small></div>
+        <ul class="legend" id="legend"></ul>
+      </section>
+
+      <section class="card" aria-labelledby="h-soon">
+        <h2 id="h-soon">Drink next</h2>
+        <ul class="soon" id="soon"></ul>
+        <p class="none" id="soon-none">Nothing is in its final year or past its peak.</p>
+        <button class="btn hist-btn" type="button" id="hist-btn">Drunk bottles</button>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="edge" id="edge" aria-hidden="true"></div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Undo</button></div>
+
+<script>
+(() => {
+  // The cellar holds one or more fridges. The first ("main") keeps its bottles in the
+  // top-level "slots" collection; added fridges use fridges/<id>/slots.
+  const MAIN = { id: "main", name: "Fridge 1", rungs: 6, perRung: 5, magnums: 3, order: 0 };
+  let fridges = [MAIN];
+  let currentFid = "main";
+  const allBottles = { main: {} };
+  const fridgeById = fid => fridges.find(f => f.id === fid) || MAIN;
+  // Each user's cellar lives under cellars/<cellarId>/; base "" is the original
+  // top-level cellar (the owner's, from before usernames existed).
+  let base = "";
+  const P = path => base + path;
+  const colPath = (fid = currentFid) => P(fid === "main" ? "slots" : `fridges/${fid}/slots`);
+  const slotIdsFor = f => {
+    const ids = [];
+    for (let r = 1; r <= f.rungs; r++) for (let p = 1; p <= f.perRung; p++) ids.push(`r${r}-${p}`);
+    for (let p = 1; p <= f.magnums; p++) ids.push(`m-${p}`);
+    return ids;
+  };
+  const THIS_YEAR = new Date().getFullYear();
+
+  const TYPES = {
+    red:       { label: "Red",        fill: "#5a1426", ink: "#f4e9ec" },
+    white:     { label: "White",      fill: "#d6c46f", ink: "#2a2410" },
+    rose:      { label: "Rosé",       fill: "#e59aa6", ink: "#3a151c" },
+    orange:    { label: "Orange",     fill: "#e2742b", ink: "#2b1204" },
+    sparkling: { label: "Sparkling",  fill: "#eee0a2", ink: "#2c2610" },
+    dessert:   { label: "Dessert",    fill: "#c98a2b", ink: "#2a1a05" },
+    fortified: { label: "Fortified",  fill: "#6b2a12", ink: "#f6e6dc" },
+  };
+
+  const STATUS = {
+    open:  { label: "Opening up",          desc: "Early in its window",          c: "var(--st-open)" },
+    ready: { label: "At its peak",         desc: "The heart of its window",      c: "var(--st-ready)" },
+    drinkup: { label: "Drink up",          desc: "Late in its window",           c: "var(--st-drinkup)" },
+    last:  { label: "Final year",          desc: "Window closes this year",      c: "var(--st-last)" },
+    wait:  { label: "Not ready",           desc: "Window hasn't opened",         c: "var(--st-wait)" },
+    past:  { label: "Past peak",           desc: "Window has closed",            c: "var(--st-past)" },
+    none:  { label: "No window found",     desc: "Research found no window",     c: "var(--st-none)" },
+    pending: { label: "Being researched",  desc: "Details still to come",        c: "var(--st-none)" },
+  };
+  const PENDING_FILL = { fill: "#2b3338", ink: "#c9d2d6" };
+
+  // Slot ids double as db document ids: r<rung>-<position>, m-<position>
+  let slotIds = slotIdsFor(MAIN);
+
+  const slotName = id => id.startsWith("m-") ? `Magnum space ${id.slice(2)}` : `Rung ${id.slice(1, 2)}, space ${id.slice(3)}`;
+  const slotCode = id => id.startsWith("m-") ? `Magnum · ${id.slice(2)}` : `Rung ${id.slice(1, 2)} · Space ${id.slice(3)}`;
+
+  let bottles = allBottles.main;   // slotId -> data, for the fridge on screen
+  let db = null;
+  let saving = false;
+
+  const $ = s => document.querySelector(s);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v;
+      else if (k === "style") n.setAttribute("style", v);
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else if (v !== undefined && v !== null && v !== false) n.setAttribute(k, v === true ? "" : v);
+    }
+    for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : document.createTextNode(k));
+    return n;
+  };
+
+  function statusOf(b) {
+    if (b.research === "pending") return "pending";
+    const from = num(b.drinkFrom), until = num(b.drinkBy);
+    if (!from && !until) return "none";
+    if (from && THIS_YEAR < from) return "wait";
+    if (until && THIS_YEAR > until) return "past";
+    if (until && THIS_YEAR === until) return "last";
+    return stageOf(from, until);
+  }
+  // Splits a window into opening up (first ~quarter), peak (middle) and drink up (last ~quarter).
+  // Windows of three years or less are all "peak" until the final year.
+  function stageOf(from, until) {
+    if (!from || !until || until - from < 3) return "ready";
+    const q = Math.max(1, Math.round((until - from) / 4));
+    if (THIS_YEAR < from + q) return "open";
+    if (THIS_YEAR > until - q) return "drinkup";
+    return "ready";
+  }
+  // Age-worthy reds often go quiet for a spell roughly 3-10 years after vintage.
+  function quietPhase(b) {
+    const v = num(b.vintage), u = num(b.drinkBy);
+    if (b.type !== "red" || !v || !u || u - v < 12) return false;
+    const age = THIS_YEAR - v, st = statusOf(b);
+    return age >= 3 && age <= 10 && (st === "wait" || st === "open" || st === "ready");
+  }
+  function num(v) { const n = parseInt(v, 10); return Number.isFinite(n) ? n : null; }
+  function windowText(b) {
+    const f = num(b.drinkFrom), u = num(b.drinkBy);
+    if (f && u) return `${f}–${u}`;
+    if (f) return `From ${f}`;
+    if (u) return `By ${u}`;
+    return "Not set";
+  }
+
+  // ---------- Fridge ----------
+  let slotButtons = {};
+  function buildFridge() {
+    const f = fridgeById(currentFid);
+    const glass = $("#glass");
+    glass.replaceChildren(el("div", { class: "led", "aria-hidden": "true" }));
+    slotButtons = {};
+    slotIds = slotIdsFor(f);
+    for (let r = 1; r <= f.rungs; r++) {
+      const row = el("div", { class: "slots", style: `grid-template-columns: repeat(${f.perRung}, minmax(0, 1fr))` });
+      for (let p = 1; p <= f.perRung; p++) row.append(makeSlot(`r${r}-${p}`));
+      glass.append(el("div", { class: "rung" }, row));
+    }
+    if (f.magnums > 0) {
+      const mrow = el("div", { class: "slots mag", style: `grid-template-columns: repeat(${f.magnums}, minmax(0, 1fr))` });
+      for (let p = 1; p <= f.magnums; p++) mrow.append(makeSlot(`m-${p}`));
+      glass.append(el("div", { class: "base" }, el("div", { class: "rung" }, el("span", { class: "rung-label", "aria-hidden": "true" }, "MAG"), mrow)));
+    }
+    $(".fridge").setAttribute("aria-label", `${f.name}, front view`);
+  }
+  function renderTabs() {
+    const tabs = $("#fridge-tabs");
+    tabs.hidden = fridges.length < 2;
+    tabs.replaceChildren(...fridges.map(f => el("li", {},
+      el("button", { type: "button", "aria-current": f.id === currentFid ? "true" : "false",
+        title: f.id === currentFid ? "Rename or delete this fridge" : `Show ${f.name}`,
+        onclick: () => f.id === currentFid ? showFridgeOptions(f.id) : switchFridge(f.id) }, f.name))));
+    $("#h-in").textContent = fridges.length > 1 ? `In ${fridgeById(currentFid).name}` : "In the fridge";
+  }
+  function switchFridge(fid, dir) {
+    if (!fridges.some(f => f.id === fid)) fid = "main";
+    const fr = $(".fridge");
+    fr.classList.remove("in-left", "in-right");
+    if (dir) { void fr.offsetWidth; fr.classList.add(dir > 0 ? "in-right" : "in-left"); }
+    currentFid = fid;
+    bottles = allBottles[fid] || (allBottles[fid] = {});
+    buildFridge(); renderTabs(); render();
+  }
+  function makeSlot(id) {
+    const b = el("button", { class: "slot", type: "button", id: `slot-${id}`, onclick: () => { if (!suppressClick) openSlot(id); } });
+    slotButtons[id] = b;
+    return b;
+  }
+
+  function render() {
+    for (const id of slotIds) {
+      const btn = slotButtons[id];
+      const b = bottles[id];
+      btn.replaceChildren();
+      if (!b) {
+        btn.append(el("span", { class: "empty", "aria-hidden": "true" }, "+"));
+        btn.setAttribute("aria-label", `${slotName(id)}: empty. Add a bottle.`);
+        btn.title = "Empty — add a bottle";
+      } else {
+        const t = TYPES[b.type] || PENDING_FILL;
+        const st = STATUS[statusOf(b)];
+        const vint = b.vintage ? `’${String(b.vintage).slice(-2)}` : "NV";
+        btn.append(el("span", { class: "bottle", "aria-hidden": "true", style: `--wine:${t.fill};--vint-ink:${t.ink};--status:${st.c}` }, el("span", { class: "vint" }, vint)));
+        const label = [b.producer, b.name, b.vintage].filter(Boolean).join(" ");
+        btn.setAttribute("aria-label", `${slotName(id)}: ${label}. ${st.label}.`);
+        btn.title = `${label} — ${st.label}`;
+      }
+    }
+    renderSummary();
+  }
+
+  function renderSummary() {
+    const filled = slotIds.filter(id => bottles[id]);
+    $("#count").replaceChildren(String(filled.length), el("small", {}, `of ${slotIds.length} spaces`));
+    const counts = Object.fromEntries(Object.keys(STATUS).map(k => [k, 0]));
+    filled.forEach(id => counts[statusOf(bottles[id])]++);
+    $("#legend").replaceChildren(...Object.entries(STATUS).map(([k, s]) =>
+      el("li", {}, el("span", { class: "dot", style: `--c:${s.c}` }),
+        el("span", {}, s.label, " ", el("span", { class: "desc" }, `· ${s.desc}`)),
+        el("span", { class: "n" }, String(counts[k])))
+    ));
+
+    const urgent = filled
+      .filter(id => ["past", "last", "drinkup"].includes(statusOf(bottles[id])))
+      .sort((a, b) => (num(bottles[a].drinkBy) || 0) - (num(bottles[b].drinkBy) || 0));
+    $("#soon").replaceChildren(...urgent.map(id => {
+      const b = bottles[id], st = STATUS[statusOf(b)];
+      return el("li", {}, el("button", { type: "button", onclick: () => openSlot(id) },
+        el("span", { class: "dot", style: `--c:${st.c}` }),
+        el("span", {}, el("span", { class: "nm" }, [b.name, b.vintage].filter(Boolean).join(" ")), el("br"), el("span", { class: "meta" }, slotCode(id))),
+        el("span", { class: "meta" }, `by ${b.drinkBy}`)));
+    }));
+    $("#soon-none").hidden = urgent.length > 0;
+  }
+
+  // ---------- Dialog ----------
+  const dlg = $("#dlg");
+  function openSlot(id) { bottles[id] ? showBottle(id) : showForm(id); }
+  function openDialog(content) {
+    dlg.replaceChildren(content);
+    if (!dlg.open) dlg.showModal();
+  }
+  let dlgLocked = false;   // true while the username setup is showing
+  dlg.addEventListener("click", e => { if (e.target === dlg && !dlgLocked) dlg.close(); });
+  dlg.addEventListener("cancel", e => { if (dlgLocked) e.preventDefault(); });
+
+  function head(id, title) {
+    return el("div", { class: "dlg-head" },
+      el("div", {}, el("div", { class: "slotcode" }, slotCode(id)), el("h3", {}, title)),
+      el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×"));
+  }
+
+  const fmtDate = iso => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
+  // h: a drunk-bottles entry, shown read-only with the same card as a bottle in the fridge
+  function showBottle(id, h) {
+    const b = h || bottles[id];
+    const t = TYPES[b.type];
+    const skey = statusOf(b), st = STATUS[skey];
+    const pending = skey === "pending";
+    const dash = v => v ? String(v) : "—";
+    const facts = [
+      ["Vintage", b.vintage || "Non-vintage"],
+      ["Style", t ? t.label : null], ["Blend style", b.blendStyle], ["Producer / estate", b.producer], ["Country", b.country],
+      ["Appellation", b.appellation], ["Varietal(s)", b.varietals],
+      ["Drink from", b.drinkFrom], ["Drink to", b.drinkBy],
+    ];
+    const notes = Array.isArray(b.tastingNotes) ? b.tastingNotes.filter(n => n && n.text) : [];
+    const sources = Array.isArray(b.sources) ? b.sources.filter(s => s && s.url) : [];
+    const link = (url, label) => /^https?:\/\//.test(url) ? el("a", { href: url, target: "_blank", rel: "noopener" }, label) : label;
+
+    openDialog(el("div", { class: "dlg" },
+      h ? el("div", { class: "dlg-head" },
+            el("div", {}, el("div", { class: "slotcode" }, "Drunk bottle"), el("h3", {}, b.name)),
+            el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×"))
+        : head(id, b.name),
+      el("div", { class: "window" },
+        h ? el("span", { class: "pill", style: "--c:var(--accent)" }, `Drunk ${fmtDate(h.drunkAt)}`) : el("span", { class: "pill", style: `--c:${st.c}` }, st.label),
+        windowTrack(b),
+        !h && quietPhase(b) ? el("p", { class: "quiet" }, "May be in a quiet phase. Age-worthy reds often go muted for a spell between about 3 and 10 years old; if it tastes closed, that's usually temporary.") : null),
+      !h && pending && b.researchNote
+        ? el("p", { class: "notice" }, "Claude needs your help to identify this wine: " + b.researchNote)
+        : !h && pending
+        ? el("div", { class: "notice" },
+            el("p", { style: "margin:0 0 6px" }, "Claude hasn't researched this wine yet."),
+            el("p", { style: "margin:0" }, el("strong", {}, "Before you ask Claude to research it: "),
+              "set network access to Full. At claude.ai/code, tap the cloud icon above the message box, then the gear next to your environment, then Network access. Switch it back to Trusted afterwards."))
+        : null,
+      el("dl", { class: "facts" }, ...facts.flatMap(([k, v]) => [el("dt", {}, k), el("dd", {}, pending && !v ? "…" : dash(v))])),
+      el("div", { class: "tn" },
+        el("div", { class: "slotcode" }, "Tasting notes"),
+        notes.length
+          ? notes.map(n => el("figure", { class: "tnote" },
+              el("blockquote", {}, n.text),
+              el("figcaption", {}, link(n.url || "", n.source || "Source"))))
+          : el("p", { class: "notes-empty" }, pending ? "Waiting for research." : "No published tasting notes were found.")),
+      sources.length ? el("div", { class: "tn" },
+        el("div", { class: "slotcode" }, "Sources"),
+        el("ul", { class: "srcs" }, sources.map(s => el("li", {}, link(s.url, s.label || s.url))))) : null,
+      b.addedAt ? el("p", { class: "added" }, `Put in the fridge ${fmtDate(b.addedAt)}` +
+        (h && h.slot ? ` · drunk from ${h.fridgeName ? h.fridgeName + ", " : ""}${slotCode(h.slot)}` : "")) : null,
+      h ? el("div", { class: "actions" },
+            el("button", { class: "btn danger", type: "button", onclick: () => removeHistory(h) }, "Remove from list"),
+            el("button", { class: "btn", type: "button", onclick: () => showHistory() }, "Back to list"))
+        : el("div", { class: "actions" },
+            el("button", { class: "btn", type: "button", onclick: () => showForm(id) }, "Edit"),
+            el("button", { class: "btn primary", type: "button", id: "drink-btn", onclick: () => drink(id) }, "Drink it"))
+    ));
+  }
+
+  function windowTrack(b) {
+    const f = num(b.drinkFrom), u = num(b.drinkBy);
+    if (!f || !u || u < f) return null;
+    const lo = Math.min(f, THIS_YEAR) - 1, hi = Math.max(u, THIS_YEAR) + 1;
+    const pct = y => ((y - lo) / (hi - lo)) * 100;
+    return el("div", { class: "track", "aria-hidden": "true" },
+      el("div", { class: "axis" }),
+      ...(u - f < 3
+        ? [el("div", { class: "bar", style: `left:${pct(f)}%;width:${pct(u) - pct(f)}%` })]
+        : (() => { const q = Math.max(1, Math.round((u - f) / 4));
+            return [[f, f + q, "--st-open"], [f + q, u - q, "--st-ready"], [u - q, u, "--st-drinkup"]]
+              .map(([a, z, c], i) => el("div", { class: `bar seg s${i}`, style: `left:${pct(a)}%;width:${pct(z) - pct(a)}%;background:var(${c})` })); })()),
+      el("div", { class: "now", style: `left:${pct(THIS_YEAR)}%`, title: String(THIS_YEAR) }),
+      el("span", { class: "tick", style: `left:${pct(f)}%` }, String(f)),
+      THIS_YEAR !== f && THIS_YEAR !== u ? el("span", { class: "tick", style: `left:${pct(THIS_YEAR)}%;font-weight:700;color:var(--ink)` }, "now") : null,
+      u !== f ? el("span", { class: "tick", style: `left:${pct(u)}%` }, String(u)) : null);
+  }
+
+  function showForm(id) {
+    const b = bottles[id] || {};
+    const isMag = id.startsWith("m-");
+    const field = (name, label, attrs = {}) => el("label", { for: `f-${name}` }, label,
+      el("input", { id: `f-${name}`, name, value: b[name] ?? "", ...attrs }));
+    const editing = !!bottles[id];
+    const typeSel = el("select", { id: "f-type", name: "type" },
+      el("option", { value: "", selected: !b.type }, "Not known"),
+      ...Object.entries(TYPES).map(([k, t]) => el("option", { value: k, selected: b.type === k }, t.label)));
+    const err = el("p", { class: "err", role: "alert" });
+    const saveBtn = el("button", { class: "btn primary", type: "submit" }, editing ? "Save changes" : "Put it in the fridge");
+
+    const nameRow = el("div", { class: "row-nv" },
+      field("name", "Wine name *", { required: true, autocomplete: "off", placeholder: "e.g. Kanonkop Paul Sauer" }),
+      field("vintage", "Vintage", { inputmode: "numeric", placeholder: "NV" }));
+    const form = el("form", { class: "dlg", novalidate: true },
+      head(id, editing ? "Edit bottle" : (isMag ? "Add a magnum" : "Add a bottle")),
+      nameRow,
+      editing ? [
+        el("p", { class: "hint" }, "Correct anything the research got wrong. Tasting notes and sources stay as researched."),
+        el("div", { class: "row2" },
+          el("label", { for: "f-type" }, "Style", typeSel),
+          field("producer", "Producer / estate", { autocomplete: "off" })),
+        el("div", { class: "row2" },
+          field("country", "Country", { autocomplete: "off" }),
+          field("appellation", "Appellation", { autocomplete: "off" })),
+        el("div", { class: "row2" },
+          field("varietals", "Varietal(s)", { autocomplete: "off" }),
+          field("blendStyle", "Blend style", { autocomplete: "off", placeholder: "e.g. Rhône blend" })),
+        el("div", { class: "row2" },
+          field("drinkFrom", "Drink from (year)", { inputmode: "numeric" }),
+          field("drinkBy", "Drink to (year)", { inputmode: "numeric" })),
+      ] : el("p", { class: "hint" }, "Claude looks up the rest: style, producer, country, appellation, varietals, drinking window and critics' tasting notes."),
+      err,
+      el("div", { class: "actions" },
+        el("button", { class: "btn", type: "button", onclick: () => bottles[id] ? showBottle(id) : dlg.close() }, "Cancel"),
+        saveBtn));
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const v = k => String(fd.get(k) || "").trim();
+      const base = { name: v("name"), vintage: v("vintage"), size: isMag ? "magnum" : "750ml" };
+      const data = editing
+        ? { ...b, ...base, type: v("type"), producer: v("producer"), country: v("country"), appellation: v("appellation"),
+            varietals: v("varietals"), blendStyle: v("blendStyle"), drinkFrom: v("drinkFrom"), drinkBy: v("drinkBy") }
+        : { ...base, research: "pending", addedAt: new Date().toISOString() };
+      // Changing the wine itself on an edit sends it back for research
+      if (editing && (base.name !== b.name || base.vintage !== (b.vintage || ""))) data.research = "pending";
+      const yearOk = s => !s || /^\d{4}$/.test(s);
+      if (!data.name) return (err.textContent = "Give the wine a name.");
+      if (!yearOk(data.vintage)) return (err.textContent = "Vintage should be a four-digit year, or blank for non-vintage.");
+      if (!yearOk(data.drinkFrom) || !yearOk(data.drinkBy)) return (err.textContent = "Drinking window years should be four digits, like 2027.");
+      if (data.drinkFrom && data.drinkBy && +data.drinkBy < +data.drinkFrom) return (err.textContent = "Drink-by year is earlier than drink-from year.");
+      err.textContent = "";
+      saveBtn.disabled = true;
+      const ok = await saveSlot(id, data);
+      saveBtn.disabled = false;
+      if (ok) showBottle(id);
+      else err.textContent = "Couldn't save the bottle. Check your connection and try again.";
+    });
+
+    openDialog(form);
+    setTimeout(() => form.querySelector("#f-name")?.focus(), 30);
+  }
+
+  // ---------- Storage ----------
+  async function saveSlot(id, data) {
+    const prev = bottles[id];
+    bottles[id] = data; render();
+    if (!db) return true;
+    try { await db.doc(`${colPath()}/${id}`).set(data); return true; }
+    catch (e) { console.error(e); if (prev) bottles[id] = prev; else delete bottles[id]; render(); return false; }
+  }
+  async function clearSlot(id) {
+    const prev = bottles[id];
+    delete bottles[id]; render();
+    if (!db) return true;
+    try { await db.doc(`${colPath()}/${id}`).delete(); return true; }
+    catch (e) { console.error(e); bottles[id] = prev; render(); return false; }
+  }
+
+  // ---------- Moving bottles (hold, then drag) ----------
+  // Magnums only fit the magnum shelf; standard bottles only fit the rungs.
+  const fits = (b, slotId) => (b.size === "magnum") === slotId.startsWith("m-");
+  const HOLD_MS = 380, SLOP = 10;
+  let press = null, drag = null, suppressClick = false;
+
+  function slotAt(x, y) {
+    const hit = document.elementFromPoint(x, y);
+    const s = hit && hit.closest ? hit.closest(".slot") : null;
+    return s ? s.id.replace("slot-", "") : null;
+  }
+  function startPress(id, x, y) {
+    if (!bottles[id] || drag) return;
+    cancelPress();
+    press = { id, x, y, timer: setTimeout(() => beginDrag(x, y), HOLD_MS) };
+  }
+  function cancelPress() { if (press) clearTimeout(press.timer); press = null; }
+  function beginDrag(x, y) {
+    const id = press.id, b = bottles[id];
+    press = null;
+    if (!b) return;
+    const targets = slotIds.filter(s => s !== id && fits(b, s) && (!bottles[s] || fits(bottles[s], id)));
+    const src = slotButtons[id];
+    const ghost = el("div", { class: "drag-ghost", "aria-hidden": "true" });
+    const face = src.querySelector(".bottle");
+    if (face) ghost.append(face.cloneNode(true));
+    document.body.append(ghost);
+    src.classList.add("drag-src");
+    targets.forEach(s => slotButtons[s].classList.add("drop-ok"));
+    drag = { id, targets, ghost, over: null };
+    moveDrag(x, y);
+  }
+  function moveDrag(x, y) {
+    drag.ghost.style.transform = `translate(${x - 28}px, ${y - 28}px)`;
+    const over = slotAt(x, y);
+    const ok = over && drag.targets.includes(over) ? over : null;
+    if (ok !== drag.over) {
+      if (drag.over) slotButtons[drag.over].classList.remove("drop-hover");
+      if (ok) slotButtons[ok].classList.add("drop-hover");
+      drag.over = ok;
+    }
+  }
+  function endDrag(commit) {
+    const { id, over, ghost, targets } = drag;
+    drag = null;
+    ghost.remove();
+    slotButtons[id].classList.remove("drag-src");
+    targets.forEach(s => slotButtons[s].classList.remove("drop-ok", "drop-hover"));
+    suppressClick = true;
+    setTimeout(() => (suppressClick = false), 350);
+    if (commit && over) moveBottle(id, over);
+  }
+
+  async function moveBottle(from, to, isUndo) {
+    const a = bottles[from], b = bottles[to];
+    if (!a) return;
+    bottles[to] = a;
+    if (b) bottles[from] = b; else delete bottles[from];
+    render();
+    if (db) {
+      try {
+        const col = colPath();
+        await db.doc(`${col}/${to}`).set({ ...a });
+        if (b) await db.doc(`${col}/${from}`).set({ ...b });
+        else await db.doc(`${col}/${from}`).delete();
+      } catch (e) {
+        console.error(e);
+        bottles[from] = a;
+        if (b) bottles[to] = b; else delete bottles[to];
+        render();
+        return toast("Couldn't move the bottle. Try again.");
+      }
+    }
+    if (isUndo) return;
+    toast(b ? `Swapped with ${b.name}.` : `Moved to ${slotCode(to)}.`, () => moveBottle(to, from, true));
+  }
+
+  const glassEl = $("#glass");
+  glassEl.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1) return cancelPress();
+    const s = e.target.closest(".slot");
+    if (s) startPress(s.id.replace("slot-", ""), e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  document.addEventListener("touchmove", e => {
+    const t = e.touches[0];
+    if (drag) { e.preventDefault(); moveDrag(t.clientX, t.clientY); return; }
+    if (press && Math.hypot(t.clientX - press.x, t.clientY - press.y) > SLOP) cancelPress();
+  }, { passive: false });
+  document.addEventListener("touchend", () => { if (drag) endDrag(true); else cancelPress(); });
+  document.addEventListener("touchcancel", () => { if (drag) endDrag(false); else cancelPress(); });
+  glassEl.addEventListener("contextmenu", e => { if (e.target.closest(".slot")) e.preventDefault(); });
+  // Mouse: same hold-then-drag on desktop
+  glassEl.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    const s = e.target.closest(".slot");
+    if (s) startPress(s.id.replace("slot-", ""), e.clientX, e.clientY);
+  });
+  document.addEventListener("pointermove", e => {
+    if (e.pointerType !== "mouse") return;
+    if (drag) return moveDrag(e.clientX, e.clientY);
+    if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > SLOP) cancelPress();
+  });
+  document.addEventListener("pointerup", e => {
+    if (e.pointerType !== "mouse") return;
+    if (drag) endDrag(true); else cancelPress();
+  });
+
+  let toastTimer = null;
+  async function drink(id) {
+    if (saving) return;
+    saving = true;
+    const was = bottles[id];
+    const btn = $("#drink-btn"); if (btn) btn.disabled = true;
+    const hid = "h" + Date.now().toString(36);
+    const entry = { ...was, drunkAt: new Date().toISOString(), fridgeId: currentFid, fridgeName: fridges.length > 1 ? fridgeById(currentFid).name : "", slot: id };
+    if (db) {
+      try { await db.doc(P(`history/${hid}`)).set(entry); }
+      catch (e) { console.error(e); saving = false; if (btn) btn.disabled = false; return toast("Couldn't record the bottle. Try again."); }
+    } else history = [{ id: hid, ...entry }, ...history];
+    const ok = await clearSlot(id);
+    saving = false;
+    if (!ok) {
+      if (db) db.doc(P(`history/${hid}`)).delete().catch(console.error); else history = history.filter(x => x.id !== hid);
+      if (btn) btn.disabled = false; return toast("Couldn't clear the space. Try again.");
+    }
+    renderHistoryBtn();
+    dlg.close();
+    toast(`Enjoy the ${was.name}. ${slotCode(id)} is now empty.`, async () => {
+      if (db) db.doc(P(`history/${hid}`)).delete().catch(console.error); else { history = history.filter(x => x.id !== hid); renderHistoryBtn(); }
+      if (bottles[id]) return;           // space already refilled
+      await saveSlot(id, was);
+    });
+  }
+
+  // ---------- Drunk bottles ----------
+  let history = [];
+  let histFilter = "";
+  function renderHistoryBtn() {
+    $("#hist-btn").textContent = history.length ? `Drunk bottles (${history.length})` : "Drunk bottles";
+  }
+  function showHistory() {
+    const list = el("ul", { class: "hist" });
+    const fill = () => {
+      const q = histFilter.trim().toLowerCase();
+      const rows = history
+        .filter(h => !q || [h.name, h.producer, h.vintage, h.varietals, h.appellation].filter(Boolean).join(" ").toLowerCase().includes(q))
+        .sort((a, b) => String(b.drunkAt).localeCompare(String(a.drunkAt)));
+      list.replaceChildren(...(rows.length ? rows.map(h => {
+        const t = TYPES[h.type] || PENDING_FILL;
+        return el("li", {}, el("button", { type: "button", onclick: () => showBottle(null, h) },
+          el("span", { class: "dot", style: `--c:${t.fill}` }),
+          el("span", {}, el("span", { class: "nm" }, [h.name, h.vintage || "NV"].join(" ")), el("br"), el("span", { class: "meta" }, h.producer || "")),
+          el("span", { class: "meta" }, fmtDate(h.drunkAt))));
+      }) : [el("li", {}, el("p", { class: "none", style: "padding:10px 0" }, history.length ? "No drunk bottles match that search." : "Bottles you drink will be listed here, with the date and their full notes."))]));
+    };
+    const search = el("input", { class: "hist-search", id: "hist-search", type: "search", placeholder: "Search by wine, producer or vintage", value: histFilter, autocomplete: "off" });
+    search.addEventListener("input", () => { histFilter = search.value; fill(); });
+    fill();
+    openDialog(el("div", { class: "dlg" },
+      el("div", { class: "dlg-head" },
+        el("div", {}, el("div", { class: "slotcode" }, `${history.length} bottle${history.length === 1 ? "" : "s"}`), el("h3", {}, "Drunk bottles")),
+        el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×")),
+      history.length > 3 ? search : null,
+      list));
+  }
+  async function removeHistory(h) {
+    const { id: hid, ...data } = h;
+    if (db) { try { await db.doc(P(`history/${hid}`)).delete(); } catch (e) { console.error(e); return toast("Couldn't remove it. Try again."); } }
+    else { history = history.filter(x => x.id !== hid); renderHistoryBtn(); }
+    dlg.close();   // the toast (with Undo) sits under any open dialog
+    toast(`${h.name} removed from the list.`, async () => {
+      if (db) await db.doc(P(`history/${hid}`)).set(data).catch(console.error);
+      else { history = [h, ...history]; renderHistoryBtn(); }
+    });
+  }
+  $("#hist-btn").addEventListener("click", () => showHistory());
+  function toast(msg, undo) {
+    const t = $("#toast");
+    $("#toast-msg").textContent = msg;
+    const u = $("#toast-undo");
+    u.hidden = !undo;
+    u.onclick = async () => { t.hidden = true; clearTimeout(toastTimer); if (undo) await undo(); };
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.hidden = true), 7000);
+  }
+
+  function notice(msg) { const n = $("#notice"); n.textContent = msg; n.hidden = !msg; }
+
+  // ---------- Adding a fridge (hold the right-hand edge) ----------
+  function showAddFridge() {
+    const n = fridges.length + 1;
+    const err = el("p", { class: "err", role: "alert" });
+    const numField = (name, label, value, min, max) => el("label", { for: `af-${name}` }, label,
+      el("input", { id: `af-${name}`, name, value: String(value), inputmode: "numeric", min: String(min), max: String(max) }));
+    const form = el("form", { class: "dlg", novalidate: true },
+      el("div", { class: "dlg-head" },
+        el("div", {}, el("div", { class: "slotcode" }, cellarName()), el("h3", {}, "Add a wine fridge")),
+        el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×")),
+      el("label", { for: "af-name" }, "Name", el("input", { id: "af-name", name: "name", value: `Fridge ${n}`, autocomplete: "off" })),
+      el("div", { class: "row3" },
+        numField("rungs", "Rungs", 6, 1, 9),
+        numField("perRung", "Bottles per rung", 5, 1, 9),
+        numField("magnums", "Magnum spaces", 3, 0, 9)),
+      el("p", { class: "hint" }, "Starts with the same layout as your first fridge. Change the numbers to match the new one."),
+      err,
+      el("div", { class: "actions" },
+        el("button", { class: "btn", type: "button", onclick: () => dlg.close() }, "Cancel"),
+        el("button", { class: "btn primary", type: "submit" }, "Add fridge")));
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const name = String(fd.get("name") || "").trim();
+      const int = (k, lo, hi) => { const v = parseInt(fd.get(k), 10); return Number.isFinite(v) && v >= lo && v <= hi ? v : null; };
+      const rungs = int("rungs", 1, 9), perRung = int("perRung", 1, 9), magnums = int("magnums", 0, 9);
+      if (!name) return (err.textContent = "Give the fridge a name.");
+      if (rungs == null || perRung == null || magnums == null) return (err.textContent = "Rungs and bottles per rung go from 1 to 9; magnum spaces from 0 to 9.");
+      const id = "f" + Date.now().toString(36);
+      const f = { id, name, rungs, perRung, magnums, order: fridges.length, createdAt: new Date().toISOString() };
+      fridges.push(f); allBottles[id] = {};
+      if (db) {
+        try { const { id: _, ...doc } = f; await db.doc(P(`fridges/${id}`)).set(doc); watchFridge(id); }
+        catch (e2) { console.error(e2); fridges = fridges.filter(x => x.id !== id); return (err.textContent = "Couldn't add the fridge. Check your connection and try again."); }
+      }
+      dlg.close();
+      switchFridge(id);
+      toast(`${name} added to the cellar.`);
+    });
+    openDialog(form);
+  }
+
+  const edge = $("#edge");
+  // Hold ~0.55s: the handle brightens; opening happens on release so the lift
+  // doesn't land on the dialog's backdrop and close it.
+  let edgeTimer = null, edgeStart = null, edgeArmed = false;
+  const edgeCancel = () => { clearTimeout(edgeTimer); edgeTimer = null; edgeStart = null; edgeArmed = false; edge.classList.remove("holding"); };
+  const edgeBegin = (x, y) => {
+    edgeCancel(); edgeStart = { x, y };
+    edgeTimer = setTimeout(() => { edgeArmed = true; edge.classList.add("holding"); }, 550);
+  };
+  const edgeRelease = e => {
+    const armed = edgeArmed; edgeCancel();
+    if (!armed) return;
+    if (e && e.cancelable) e.preventDefault();
+    if (!dlg.open) setTimeout(showAddFridge, 0);
+  };
+  edge.addEventListener("touchstart", e => { if (e.touches.length === 1) edgeBegin(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+  edge.addEventListener("touchmove", e => { const t = e.touches[0]; if (edgeStart && !edgeArmed && Math.hypot(t.clientX - edgeStart.x, t.clientY - edgeStart.y) > 10) edgeCancel(); }, { passive: true });
+  edge.addEventListener("touchend", edgeRelease, { passive: false });
+  edge.addEventListener("touchcancel", edgeCancel);
+  edge.addEventListener("contextmenu", e => e.preventDefault());
+  edge.addEventListener("pointerdown", e => { if (e.pointerType === "mouse" && e.button === 0) edgeBegin(e.clientX, e.clientY); });
+  edge.addEventListener("pointerup", e => { if (e.pointerType === "mouse") edgeRelease(e); });
+  edge.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") edgeCancel(); });
+
+  // ---------- Swipe between fridges ----------
+  let swipe = null;
+  const fridgeCol = $(".fridge-col");
+  fridgeCol.addEventListener("touchstart", e => {
+    swipe = fridges.length > 1 && e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() } : null;
+  }, { passive: true });
+  fridgeCol.addEventListener("touchend", e => {
+    if (!swipe || drag || dlg.open) return (swipe = null);
+    const t = e.changedTouches[0], dx = t.clientX - swipe.x, dy = t.clientY - swipe.y, dt = Date.now() - swipe.t;
+    swipe = null;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.6 || dt > 700) return;
+    const i = fridges.findIndex(f => f.id === currentFid);
+    const j = dx < 0 ? i + 1 : i - 1;           // swipe left = next fridge
+    if (j < 0 || j >= fridges.length) return;
+    suppressClick = true; setTimeout(() => (suppressClick = false), 350);
+    switchFridge(fridges[j].id, dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  // ---------- Rename / delete a fridge (tap its name when it's showing) ----------
+  function showFridgeOptions(fid) {
+    const f = fridgeById(fid);
+    const err = el("p", { class: "err", role: "alert" });
+    const form = el("form", { class: "dlg", novalidate: true },
+      el("div", { class: "dlg-head" },
+        el("div", {}, el("div", { class: "slotcode" }, cellarName()), el("h3", {}, f.name)),
+        el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×")),
+      el("label", { for: "fo-name" }, "Name", el("input", { id: "fo-name", name: "name", value: f.name, autocomplete: "off" })),
+      fid === "main" ? el("p", { class: "hint" }, "This is your first fridge, so it can be renamed but not deleted.") : null,
+      err,
+      el("div", { class: "actions" },
+        fid !== "main" ? el("button", { class: "btn danger", type: "button", onclick: () => { dlg.close(); deleteFridge(fid); } }, "Delete fridge") : null,
+        el("button", { class: "btn primary", type: "submit" }, "Save name")));
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = String(new FormData(form).get("name") || "").trim();
+      if (!name) return (err.textContent = "Give the fridge a name.");
+      const old = f.name; f.name = name; renderTabs();
+      if (db) {
+        try { fid === "main" ? await db.doc(P("fridges/main")).set({ name }) : await db.doc(P(`fridges/${fid}`)).update({ name }); }
+        catch (e2) { console.error(e2); f.name = old; renderTabs(); return (err.textContent = "Couldn't rename the fridge. Try again."); }
+      }
+      dlg.close();
+    });
+    openDialog(form);
+  }
+
+  async function deleteFridge(fid) {
+    const f = fridgeById(fid);
+    if (fid === "main") return;
+    const kept = { ...(allBottles[fid] || {}) };
+    const { id: _, ...doc } = f;
+    fridges = fridges.filter(x => x.id !== fid);
+    switchFridge("main");
+    if (db) {
+      try {
+        for (const slot of Object.keys(kept)) await db.doc(`${colPath(fid)}/${slot}`).delete();
+        await db.doc(P(`fridges/${fid}`)).delete();
+      } catch (e) { console.error(e); toast("Couldn't delete the fridge fully. Try again."); return; }
+    }
+    const n = Object.keys(kept).length;
+    toast(`${f.name} deleted${n ? `, with its ${n} bottle${n > 1 ? "s" : ""}` : ""}.`, async () => {
+      if (!fridges.some(x => x.id === fid)) { fridges.push(f); fridges.sort((a, b) => a.order - b.order); }
+      allBottles[fid] = kept;
+      if (db) {
+        try {
+          await db.doc(P(`fridges/${fid}`)).set(doc);
+          for (const [slot, data] of Object.entries(kept)) await db.doc(`${colPath(fid)}/${slot}`).set({ ...data });
+        } catch (e) { console.error(e); return toast("Couldn't restore the fridge. Try again."); }
+      }
+      switchFridge(fid);
+      toast(`${f.name} restored.`);
+    });
+  }
+
+  // ---------- Live data ----------
+  const watched = new Set();
+  function watchFridge(fid) {
+    if (!db || watched.has(fid)) return;
+    watched.add(fid);
+    db.collection(colPath(fid)).onSnapshot(snap => {
+      const ids = slotIdsFor(fridgeById(fid));
+      const next = {};
+      snap.docs.forEach(d => { if (d.exists && ids.includes(d.id)) next[d.id] = d.data(); });
+      allBottles[fid] = next;
+      if (fid === currentFid) { bottles = next; render(); }
+    }, e => {
+      console.error(e);
+      notice("Lost the connection to your saved fridge. Reload the page to reconnect.");
+    });
+  }
+
+  // ---------- Boot ----------
+  buildFridge();
+  renderTabs();
+  render();
+  notice("Connecting to your saved fridge…");
+
+  // ---------- Usernames ----------
+  // profiles/<userId> = {username, cellar}; usernames/<lowercase name> = {uid, cellar} claims the name.
+  // cellar "" means the original top-level cellar; anything else lives under cellars/<cellar>/.
+  const nameKey = n => n.toLowerCase();
+  const NAME_OK = /^[A-Za-z0-9._-]{3,20}$/;
+  // Each user can rename their cellar; the name lives in their profile as cellarName.
+  const DEFAULT_NAME = "My Cellar Space";
+  let me = null;   // { uid, profile } once signed in
+  const cellarName = () => (me && me.profile.cellarName) || DEFAULT_NAME;
+  function applyName() {
+    $("#title").textContent = cellarName();
+    document.title = cellarName();
+  }
+  function showRenameCellar() {
+    if (!me) return;
+    const err = el("p", { class: "err", role: "alert" });
+    const input = el("input", { id: "cn-name", name: "cellarName", value: me.profile.cellarName || "", placeholder: DEFAULT_NAME, autocomplete: "off", maxlength: "30" });
+    const form = el("form", { class: "dlg", novalidate: true },
+      el("div", { class: "dlg-head" },
+        el("div", {}, el("div", { class: "slotcode" }, "@" + me.profile.username), el("h3", {}, "Name your cellar")),
+        el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×")),
+      el("label", { for: "cn-name" }, "Cellar name", input),
+      el("p", { class: "hint", style: "margin:0" }, `Up to 30 characters. Leave it blank to go back to "${DEFAULT_NAME}".`),
+      err,
+      el("div", { class: "actions" },
+        el("button", { class: "btn", type: "button", onclick: () => dlg.close() }, "Cancel"),
+        el("button", { class: "btn primary", type: "submit" }, "Save")));
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = input.value.trim().slice(0, 30);
+      try { await db.doc(`profiles/${me.uid}`).update({ cellarName: name }); }
+      catch (e2) { console.error(e2); return (err.textContent = "Couldn't save the name. Check your connection and try again."); }
+      me.profile.cellarName = name;
+      applyName();
+      dlg.close();
+      toast(name ? `Your cellar is now "${name}".` : `Back to "${DEFAULT_NAME}".`);
+    });
+    openDialog(form);
+  }
+
+  // ---------- Menu (top right) ----------
+  const NETWORK_STEPS = "At claude.ai/code, tap the cloud icon above the message box, then the gear next to your environment, then Network access.";
+  const ledOn = () => !(me && me.profile.ledOff);
+  function applyLed() { $("#glass").classList.toggle("led-off", !ledOn()); }
+  async function setLed(on) {
+    if (me) {
+      me.profile.ledOff = !on;
+      applyLed();
+      try { await db.doc(`profiles/${me.uid}`).update({ ledOff: !on }); }
+      catch (e) { console.error(e); me.profile.ledOff = on; applyLed(); toast("Couldn't save the light setting. Try again."); return false; }
+    } else $("#glass").classList.toggle("led-off", !on);
+    return true;
+  }
+  function pendingBottles() {
+    const out = [];
+    fridges.forEach(f => Object.entries(allBottles[f.id] || {}).forEach(([slot, b]) => {
+      if (b && b.research === "pending") out.push({ ...b, slot, fridge: f.name });
+    }));
+    return out;
+  }
+  const menuRow = (label, sub, attrs, right) => el("li", {}, el("button", { type: "button", ...attrs },
+    el("span", { class: "lbl" }, label, sub ? el("small", {}, sub) : null), right));
+
+  function showMenu() {
+    const n = pendingBottles().length;
+    const on = me ? ledOn() : !$("#glass").classList.contains("led-off");
+    const led = menuRow("Fridge light", null, { role: "switch", "aria-checked": String(on), onclick: async e => {
+      const btn = e.currentTarget, next = btn.getAttribute("aria-checked") !== "true";
+      btn.setAttribute("aria-checked", String(next));
+      if (!(await setLed(next))) btn.setAttribute("aria-checked", String(!next));
+    } }, el("span", { class: "switch", "aria-hidden": "true" }));
+    openDialog(el("div", { class: "dlg" },
+      el("div", { class: "dlg-head" },
+        el("div", {}, el("div", { class: "slotcode" }, me ? "@" + me.profile.username : "Menu"), el("h3", {}, cellarName())),
+        el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×")),
+      el("ul", { class: "menu" },
+        menuRow("Rename cellar", me ? null : "Available once you're signed in", { disabled: !me, onclick: showRenameCellar }, el("span", { class: "chev", "aria-hidden": "true" }, "›")),
+        led,
+        menuRow("Research wines", n ? `${n} bottle${n === 1 ? "" : "s"} waiting` : "Nothing waiting", { onclick: showResearch }, el("span", { class: "chev", "aria-hidden": "true" }, "›")))));
+  }
+
+  function showResearch() {
+    const list = pendingBottles();
+    const multi = fridges.length > 1;
+    const copyBtn = el("button", { class: "btn primary", type: "button", onclick: async () => {
+      try { await navigator.clipboard.writeText("Research my wines"); toast('Copied "Research my wines". Paste it into Claude Code.'); }
+      catch { toast('Copying isn\'t allowed here. Type "Research my wines" in Claude Code.'); }
+    } }, "Copy request");
+    openDialog(el("div", { class: "dlg" },
+      el("div", { class: "dlg-head" },
+        el("div", {}, el("div", { class: "slotcode" }, cellarName()), el("h3", {}, "Research wines")),
+        el("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => dlg.close() }, "×")),
+      list.length
+        ? el("div", { style: "display:grid;gap:6px" },
+            el("p", { style: "margin:0" }, `${list.length} bottle${list.length === 1 ? " is" : "s are"} waiting for research:`),
+            el("ul", { class: "pend-list" }, list.map(b => el("li", {}, `${b.name}${b.vintage ? " " + b.vintage : " NV"}`, multi ? el("span", { class: "added" }, ` · ${b.fridge}`) : null))))
+        : el("p", { style: "margin:0" }, "Every bottle has been researched."),
+      el("p", { class: "added", style: "margin:0" }, "Claude does the research in a Claude Code session; the app can't search the web by itself."),
+      el("ol", { class: "steps" },
+        el("li", {}, el("strong", {}, "Set network access to Full. "), NETWORK_STEPS),
+        el("li", {}, "In Claude Code, send ", el("strong", {}, "Research my wines"), "."),
+        el("li", {}, "When it's done, switch network access back to Trusted.")),
+      el("div", { class: "actions" },
+        el("button", { class: "btn", type: "button", onclick: showMenu }, "Back"),
+        copyBtn)));
+  }
+  $("#menu-btn").addEventListener("click", showMenu);
+
+
+  function askUsername(uid, owner) {
+    return new Promise(resolve => {
+      const err = el("p", { class: "err", role: "alert" });
+      const input = el("input", { id: "un-name", name: "username", autocomplete: "off", autocapitalize: "none", spellcheck: "false", maxlength: "20" });
+      const btn = el("button", { class: "btn primary", type: "submit" }, "Open my cellar");
+      const form = el("form", { class: "dlg", novalidate: true },
+        el("div", { class: "dlg-head" },
+          el("div", {}, el("div", { class: "slotcode" }, "Welcome"), el("h3", {}, "Choose a username"))),
+        el("p", { style: "margin:0" }, owner
+          ? "Your username opens your cellar. The bottles already in this app stay in it."
+          : "Your username opens your own cellar, with its own fridges and bottles."),
+        el("label", { for: "un-name" }, "Username", input),
+        el("p", { class: "hint", style: "margin:0" }, "3 to 20 letters or numbers. Dots, dashes and underscores are fine too."),
+        err,
+        el("div", { class: "actions" }, btn));
+      form.addEventListener("submit", async e => {
+        e.preventDefault();
+        const name = input.value.trim();
+        if (!NAME_OK.test(name)) return (err.textContent = "That username doesn't fit the rule above.");
+        btn.disabled = true; err.textContent = "";
+        try {
+          const claim = await db.doc(`usernames/${nameKey(name)}`).get();
+          if (claim.exists && claim.data().uid !== uid) { btn.disabled = false; return (err.textContent = "That username is taken. Try another."); }
+          const cellar = owner ? "" : "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+          const at = new Date().toISOString();
+          await db.doc(`usernames/${nameKey(name)}`).set({ uid, cellar, username: name, createdAt: at });
+          await db.doc(`profiles/${uid}`).set({ username: name, cellar, createdAt: at });
+          dlgLocked = false; dlg.close();
+          resolve({ username: name, cellar });
+        } catch (e2) {
+          console.error(e2); btn.disabled = false;
+          err.textContent = "Couldn't save your username. Check your connection and try again.";
+        }
+      });
+      dlgLocked = true;
+      openDialog(form);
+      input.focus();
+    });
+  }
+
+  // Works out whose cellar to open. Returns false when there's no cellar for this visit.
+  async function signIn() {
+    const u = await (window.claude.use("user").catch(() => null));
+    const uid = u ? await u.id().catch(() => null) : null;
+    if (!uid) {
+      // No claude.ai identity on this page: only the owner falls back to the original cellar.
+      if (u && await u.isOwner().catch(() => false)) return true;
+      notice("Sign in to Claude to open your cellar.");
+      return false;
+    }
+    const prof = await db.doc(`profiles/${uid}`).get();
+    let p = prof.exists ? prof.data() : null;
+    if (!p || !p.username) {
+      notice("");
+      p = await askUsername(uid, await u.isOwner().catch(() => false));
+    }
+    base = p.cellar ? `cellars/${p.cellar}/` : "";
+    me = { uid, profile: { ...p } };
+    applyName();
+    applyLed();
+    return true;
+  }
+
+  const use = window.claude && window.claude.use ? window.claude.use("db") : Promise.resolve(null);
+  use.then(async ns => {
+    if (!ns) { notice("Saving isn't available in this view, so changes here will be lost when you close it. Open the page in Claude to keep your fridge."); return; }
+    db = ns;
+    if (!(await signIn())) { db = null; return; }
+    notice("");
+    watchFridge("main");
+    db.collection(P("history")).onSnapshot(snap => {
+      history = snap.docs.filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }));
+      renderHistoryBtn();
+    }, e => console.error(e));
+    db.collection(P("fridges")).onSnapshot(snap => {
+      const list = [MAIN];
+      snap.docs.forEach(d => {
+        if (!d.exists) return;
+        const x = d.data();
+        if (d.id === "main") { if (x.name) MAIN.name = x.name; return; }
+        list.push({ id: d.id, name: x.name || "Fridge", rungs: x.rungs || 6, perRung: x.perRung || 5, magnums: x.magnums ?? 3, order: x.order ?? 99 });
+      });
+      list.sort((a, b) => a.order - b.order);
+      fridges = list;
+      list.forEach(f => { if (!allBottles[f.id]) allBottles[f.id] = {}; watchFridge(f.id); });
+      if (!fridges.some(f => f.id === currentFid)) switchFridge("main");
+      else if (!dlg.open && !drag) { buildFridge(); renderTabs(); render(); }
+      else renderTabs();
+    }, e => console.error(e));
+  }).catch(() => notice("Saving isn't available in this view, so changes here will be lost when you close it."));
+})();
+</script>
