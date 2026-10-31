@@ -36,7 +36,7 @@ Use `WebSearch` and `WebFetch`. Order of preference for each field:
 **Rules (facts only, primary evidence only):**
 - Never invent or estimate a field. If nothing verifiable is found, leave it as an empty string and say so in `researchNote`.
 - Every tasting note is attributed to its source and quoted or closely paraphrased. Never blend several critics into one note, and never write one yourself.
-- Drinking window: use the producer's or a critic's stated window. If sources disagree, use the critic's stated window and name both in `researchNote`. If there's no stated window, leave it blank.
+- Drinking window: use the producer's or a critic's stated window. **Critic ranking (owner, 2026-10-31):** when stated windows disagree, use Tim Atkin MW's; if he gives none, Neal Martin / Vinous; then other named critics. Name the others in `researchNote`. If there's no stated window, estimate one (see Estimated windows below).
 - If the name matches more than one wine (e.g. one producer has several cuvées), don't guess. Leave `research: "pending"`, write the question in `researchNote`, and ask the owner.
 - Vintage matters. A note for a different vintage doesn't count.
 - **Magnums:** bottle size matters for the window. Every document has `size` (`"750ml"` or `"magnum"`; slots `m-*` are the magnum shelf). Published windows are normally for the 750ml. For a magnum, work out the 750ml window first (stated or estimated), then adjust it for slower ageing: drinkFrom = vintage + about 1.2 × (750ml from − vintage), at least one year later; drinkBy = vintage + about 1.2 × (750ml by − vintage). Record the 750ml window and the adjustment in `windowReason`. The app doesn't label the size.
